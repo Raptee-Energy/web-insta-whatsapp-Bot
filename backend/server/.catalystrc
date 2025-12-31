@@ -1,0 +1,30 @@
+{
+  "defaults": {
+    "project": 1,
+    "env": 1
+  },
+  "actives": {
+    "project": 1,
+    "env": 1
+  },
+  "projects": [
+    {
+      "idx": 1,
+      "id": "17937000000013019",
+      "name": "raptee-bot",
+      "domain": {
+        "id": "50035473533",
+        "name": "raptee-bot-60057232471.development"
+      },
+      "timezone": "Asia/Kolkata",
+      "env": [
+        {
+          "idx": 1,
+          "id": "60057232471",
+          "name": "Development",
+          "type": 3
+        }
+      ]
+    }
+  ]
+}

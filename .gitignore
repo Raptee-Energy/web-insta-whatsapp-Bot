@@ -1,0 +1,4 @@
+backend\server\node_modules\
+dashboard\dashboard\node_modules\
+backend\server\.env
+frontend\raptee-chat\node_modules\

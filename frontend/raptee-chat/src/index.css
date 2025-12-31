@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+:root {
+  /* Ensure the base font size is standard */
+  line-height: 1.5;
+  font-weight: 400;
+  
+  /* Force light mode background by default for this design */
+  background-color: #ffffff;
+  color: #000000;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  /* display: flex;  <-- REMOVED THIS (Causes centering issue) */
+  /* place-items: center; <-- REMOVED THIS */
+  min-width: 320px;
+  min-height: 100vh;
+}
