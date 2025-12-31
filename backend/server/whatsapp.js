@@ -12,23 +12,23 @@ app.use(express.json());
 app.use(cors());
 
 const PORT = 3000;
-const CHATWOOT_BASE_URL = "https://itsviswa.xyz"; 
-const CHATWOOT_ACCOUNT_ID = process.env.CHATWOOT_ACCOUNT_ID || "2";
-const CHATWOOT_API_TOKEN = process.env.CHATWOOT_API_TOKEN || "q2zguKG4dCHfTwbMD7uurjvK";
+const CHATWOOT_BASE_URL = "https://support.raptee.in"; 
+const CHATWOOT_ACCOUNT_ID = process.env.CHATWOOT_ACCOUNT_ID;
+const CHATWOOT_API_TOKEN = process.env.CHATWOOT_API_TOKEN;
 const INBOX_ID = 4; 
 
 // Meta Config
-const META_VERIFY_TOKEN = "raptee_2025"; 
-const META_PHONE_ID = "382147674981778"; 
-const META_TOKEN = "EAAG5l58dfGEBQANbk28mvahmQkpz4bxpHNj4VB7PoHlG2u6J9B4IGALZCtMYbh2jgZBVtWCKsjLbntS7ADcqgZBGfF3B3KxLQWwjPuPmYEYqkUB6qcyMAkAOyRZBWOQnZBcVdASdytuX7TegJd6UCsT0qtKK7CQmLRLiq3zJCI5ZC8eQ1aNMTDQwk5vZBtkFSG5gwZDZD";
+const META_VERIFY_TOKEN = process.env.META_VERIFY_TOKEN; 
+const META_PHONE_ID = process.env.META_PHONE_ID; 
+const META_TOKEN = process.env.META_TOKEN;
 
 const FLOW_TEMPLATE_NAME = "book_test_ride"; 
 // RAG Config (Placeholders)
-const CHROMA_API_KEY = process.env.CHROMA_API_KEY || "ck-GJzP9838Fh2zaVTDYqD7wtTnrwDC4zqyRSFA7AdzoRPk";
-const CHROMA_TENANT = process.env.CHROMA_TENANT || "41b639a8-5e0d-4be2-9baf-3d1af3588b35";
+const CHROMA_API_KEY = process.env.CHROMA_API_KEY;
+const CHROMA_TENANT = process.env.CHROMA_TENANT;
 const CHROMA_DATABASE = process.env.CHROMA_DATABASE || "bot";
 const CHROMA_COLLECTION = process.env.CHROMA_COLLECTION || "raptee_t30_faq_light";
-const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY || "XW2JnhSibycLLgD1E7xDpomTkYmOa1B8";
+const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY;
 
 let chromaClient, collection;
 (async () => {

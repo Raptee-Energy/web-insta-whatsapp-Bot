@@ -12,21 +12,23 @@ app.use(express.json());
 app.use(cors());
 
 const PORT = 3000;
-const CHATWOOT_BASE_URL = "https://itsviswa.xyz"; 
-const CHATWOOT_ACCOUNT_ID = process.env.CHATWOOT_ACCOUNT_ID || "2";
-const CHATWOOT_API_TOKEN = process.env.CHATWOOT_API_TOKEN || "q2zguKG4dCHfTwbMD7uurjvK";
+const CHATWOOT_BASE_URL = "https://support.raptee.in"; 
+const CHATWOOT_ACCOUNT_ID = process.env.CHATWOOT_ACCOUNT_ID;
+const CHATWOOT_API_TOKEN = process.env.CHATWOOT_API_TOKEN;
 const INBOX_ID = 4; 
 
-const META_VERIFY_TOKEN = "raptee_2025"; 
-const META_PHONE_ID = "382147674981778"; 
-const META_TOKEN = "EAAG5l58dfGEBQANbk28mvahmQkpz4bxpHNj4VB7PoHlG2u6J9B4IGALZCtMYbh2jgZBVtWCKsjLbntS7ADcqgZBGfF3B3KxLQWwjPuPmYEYqkUB6qcyMAkAOyRZBWOQnZBcVdASdytuX7TegJd6UCsT0qtKK7CQmLRLiq3zJCI5ZC8eQ1aNMTDQwk5vZBtkFSG5gwZDZD";
+// Meta Config
+const META_VERIFY_TOKEN = process.env.META_VERIFY_TOKEN; 
+const META_PHONE_ID = process.env.META_PHONE_ID; 
+const META_TOKEN = process.env.META_TOKEN;
 
 const FLOW_TEMPLATE_NAME = "book_test_ride"; 
-const CHROMA_API_KEY = process.env.CHROMA_API_KEY || "ck-GJzP9838Fh2zaVTDYqD7wtTnrwDC4zqyRSFA7AdzoRPk";
-const CHROMA_TENANT = process.env.CHROMA_TENANT || "41b639a8-5e0d-4be2-9baf-3d1af3588b35";
+// RAG Config (Placeholders)
+const CHROMA_API_KEY = process.env.CHROMA_API_KEY;
+const CHROMA_TENANT = process.env.CHROMA_TENANT;
 const CHROMA_DATABASE = process.env.CHROMA_DATABASE || "bot";
 const CHROMA_COLLECTION = process.env.CHROMA_COLLECTION || "raptee_t30_faq_light";
-const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY || "XW2JnhSibycLLgD1E7xDpomTkYmOa1B8";
+const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY;
 
 let chromaClient, collection;
 (async () => {
@@ -41,7 +43,7 @@ let chromaClient, collection;
 
 const mistral = new Mistral({ apiKey: MISTRAL_API_KEY });
 
-async function retrieveRelevantChunks(query, topK=5) {
+async function retrieveRelevantChunks(query, topK=3) {
     try {
         if(!collection) return [];
         const response = await mistral.embeddings.create({ model: "mistral-embed", inputs: [query] });
@@ -93,8 +95,10 @@ async function sendFlowViaMeta(userPhone) {
   } catch (error) { return false; }
 }
 
+// ✅ UPDATED: Dynamic List Menu
 async function sendListMenu(phone, customBodyText) {
     try {
+        // Default text if none provided
         const bodyText = customBodyText || "How can I help you with the T30 today?";
 
         const url = `https://graph.facebook.com/v21.0/${META_PHONE_ID}/messages`;
@@ -109,9 +113,9 @@ async function sendListMenu(phone, customBodyText) {
                     button: "Open Menu",
                     sections: [
                         { title: "Main Options", rows: [
-                            { id: "menu_book", title: " Book Test Ride", description: "Schedule a slot" },
-                            { id: "menu_showroom", title: " Showrooms", description: "Find dealers" },
-                            { id: "menu_specs", title: " Specifications", description: "Range & Speed" }
+                            { id: "menu_book", title: "📅 Book Test Ride", description: "Schedule a slot" },
+                            { id: "menu_showroom", title: "📍 Showrooms", description: "Find dealers" },
+                            { id: "menu_specs", title: "⚡ Specifications", description: "Range & Speed" }
                         ]},
                         { title: "Support", rows: [
                             { id: "menu_agent", title: "👥 Talk to Agent", description: "Human support" }
@@ -161,7 +165,6 @@ async function syncToChatwoot(phone, messageBody, type = "incoming") {
     }
 }
 
-
 app.get("/webhooks/meta", (req, res) => {
   if (req.query["hub.verify_token"] === META_VERIFY_TOKEN) {
     res.status(200).send(req.query["hub.challenge"]);
@@ -177,16 +180,17 @@ app.post("/webhooks/meta", async (req, res) => {
 
     const message = body.entry[0].changes[0].value.messages[0];
     const userPhone = message.from; 
-    console.log(` Received from ${userPhone} [${message.type}]`);
+    console.log(`📥 Received from ${userPhone} [${message.type}]`);
 
   if (message.type === "interactive" && message.interactive.type === "nfm_reply") {
     const rawJson = message.interactive.nfm_reply.response_json;
     const data = JSON.parse(rawJson);
     
-    console.log(" Raw Flow Data:", data);
+    console.log("📥 Raw Flow Data:", data);
 
     const bookingId = "TR-" + Math.floor(10000 + Math.random() * 90000);
 
+    // ✅ Updated field names
     const uName = data.name || "Guest";
     const uPhone = data.phone || userPhone;
     const uEmail = data.email || "N/A";
@@ -194,61 +198,65 @@ app.post("/webhooks/meta", async (req, res) => {
     const uDate = data.date || "Pending Date";
     const uTime = data.time || "Pending Time";
 
-    const confirmationMsg = ` *Booking Confirmed!*
+    const confirmationMsg = `✅ *Booking Confirmed!*
 
- *ID:* ${bookingId}
- *Name:* ${uName}
- *Email:* ${uEmail}
- *Phone:* ${uPhone}
- *City:* ${uCity}
- *Date:* ${uDate}
- *Time:* ${uTime}
+🆔 *ID:* ${bookingId}
+👤 *Name:* ${uName}
+📧 *Email:* ${uEmail}
+📱 *Phone:* ${uPhone}
+📍 *City:* ${uCity}
+📅 *Date:* ${uDate}
+⏰ *Time:* ${uTime}
 
 Thank you! Our team will contact you shortly to confirm the slot.`;
     
     await sendToUserWhatsApp(userPhone, confirmationMsg);
     
-    const agentViewData = ` *Test Ride Booking:*\nName: ${uName}\nPhone: ${uPhone}\nEmail: ${uEmail}\nCity: ${uCity}\nDate: ${uDate}\nTime: ${uTime}`;
+    const agentViewData = `📝 *Test Ride Booking:*\nName: ${uName}\nPhone: ${uPhone}\nEmail: ${uEmail}\nCity: ${uCity}\nDate: ${uDate}\nTime: ${uTime}`;
     await syncToChatwoot(userPhone, agentViewData, "incoming");
     await syncToChatwoot(userPhone, confirmationMsg, "outgoing");
     
     return;
 }
 
-if (message.type === "interactive" && message.interactive.type === "list_reply") {
+    // --- CASE B: USER CLICKED LIST MENU ---
+    if (message.type === "interactive" && message.interactive.type === "list_reply") {
         const choiceId = message.interactive.list_reply.id;
         const choiceTitle = message.interactive.list_reply.title;
 
         await syncToChatwoot(userPhone, choiceTitle, "incoming");
 
         if (choiceId === "menu_book") {
+            // Now we trigger the Flow because they explicitly clicked it in the menu
             await sendFlowViaMeta(userPhone);
             await syncToChatwoot(userPhone, "[Bot sent Booking Flow]", "outgoing");
         } 
         else if (choiceId === "menu_showroom") {
-            const txt = "We are located at:\n123 High Voltage St, Chennai.";
+            const txt = "📍 We are located at:\n123 High Voltage St, Chennai.";
             await sendToUserWhatsApp(userPhone, txt);
             await syncToChatwoot(userPhone, txt, "outgoing");
         }
         else if (choiceId === "menu_specs") {
-            const txt = "*Raptee T30 Specs*\nRange: 150km\nSpeed: 135km/h\n0-60: 3.5s";
+            const txt = "⚡ *Raptee T30 Specs*\nRange: 150km\nSpeed: 135km/h\n0-60: 3.5s";
             await sendToUserWhatsApp(userPhone, txt);
             await syncToChatwoot(userPhone, txt, "outgoing");
         }
         else if (choiceId === "menu_agent") {
-            const txt = "Connecting you to a human agent...";
+            const txt = "👥 Connecting you to a human agent...";
             await sendToUserWhatsApp(userPhone, txt);
             await syncToChatwoot(userPhone, txt, "outgoing");
         }
         return;
     }
 
-if (message.type === "text") {
+    // --- CASE C: TEXT MESSAGE ---
+    if (message.type === "text") {
         const text = message.text.body;
         const lowerText = text.toLowerCase();
         
         await syncToChatwoot(userPhone, text, "incoming");
 
+        // ✅ LOGIC UPDATE: Use Menu for Everything
         
         // 1. Booking Intent? -> Show Menu with custom text
         if (lowerText.includes("book") || lowerText.includes("ride")) {
