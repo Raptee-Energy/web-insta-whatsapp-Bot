@@ -18,7 +18,8 @@ import { CloudClient } from "chromadb";
 // Import bot routers
 import whatsappRouter from "./services/whatsappBot.js";
 import instaRouter from "./services/instaBot.js";
-import { initChroma, retrieveRelevantChunks, getMistral, encodeSentences } from "./services/chromaService.js";
+import { initChroma, retrieveRelevantChunks, getMistral, encodeSentences, initFromConfig, listCollections, getDocuments, addDocument, updateDocument, deleteDocument, clearCollection, createCollection, deleteCollection } from "./services/chromaService.js";
+import { getBotSettings, saveBotSettings, deleteBotSettings, getDefaultSettings, getAllChromaConfigs, getChromaConfig, getActiveChromaConfig, saveChromaConfig, updateChromaConfig, deleteChromaConfig, activateChromaConfig, buildPrompt, warmCache, initCatalyst } from "./services/settingsService.js";
 
 config();
 
@@ -31,13 +32,25 @@ const httpServer = createServer(app);
 const PORT = process.env.PORT;
 
 const io = new Server(httpServer, {
-    cors: { origin: "*", methods: ["GET", "POST"] },
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    },
+    pingTimeout: 60000,
+    pingInterval: 25000
 });
 
 app.use(express.json());
 app.use(cors());
 
+// Initialize Catalyst SDK from first request (required for AppSail)
+app.use((req, res, next) => {
+    initCatalyst(req);
+    next();
+});
+
 app.use(express.static(path.join(__dirname, "public")));
+
 
 process.on('unhandledRejection', (reason, promise) => {
     console.error('Unhandled Rejection:', reason);
@@ -111,13 +124,23 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 // 🔌 Socket.io (Website chatbot)
 io.on("connection", (socket) => {
+    console.log(`🔌 New client connected: ${socket.id}`);
+
     socket.on("join_conversation", (conversationId, callback) => {
+        console.log(`👤 Socket ${socket.id} joining conversation: ${conversationId}`);
         if (conversationId) {
             socket.join(conversationId.toString());
             if (callback) callback({ status: "joined" });
         }
     });
-    socket.on("disconnect", () => { });
+
+    socket.on("error", (error) => {
+        console.error(`❌ Socket error for ${socket.id}:`, error);
+    });
+
+    socket.on("disconnect", (reason) => {
+        console.log(`🔌 Client disconnected: ${socket.id}, reason: ${reason}`);
+    });
 });
 
 // ================================================================
@@ -210,31 +233,55 @@ async function fetchRecentMessages(conversationId, limit = 4) {
 }
 
 async function generateMistralResponse(context, userMessage, conversationHistoryText = "") {
-    const systemPrompt = `You are RapteeHV's professional AI assistant for the Raptee.HV T30 electric motorcycle.
-CONTEXT: ${context}
-Use the chunks that are most relevant to the user's query. Only answer the user's specific query.
-CONVERSATION HISTORY: ${conversationHistoryText || "None"}
-USER: ${userMessage}
+    // Load dynamic settings for website bot
+    const settings = await getBotSettings('website');
+    const intro = settings.introduction || "You are RapteeHV's professional AI assistant for the Raptee.HV T30 electric motorcycle.";
+    const dos = Array.isArray(settings.dos) ? settings.dos : [];
+    const donts = Array.isArray(settings.donts) ? settings.donts : [];
+    const wordLimit = settings.word_limit || 100;
 
-INSTRUCTIONS:
-1. Answer ONLY about Raptee.HV and the Raptee.HV T30 motorcycle (product, app, charging, warranty, etc).
-2. If user says there is a issue set needs_handoff to true.
-3. Answer only for what the user asks, don't give extra or little information, it should be balanced.
-4. If user asks about other brands or comparisons (Ather, Ola, Revolt, Ultraviolette, etc.), reply with:
-   "As a Raptee assistant ask me anything about only Raptee and its features."
-5. For general greetings like "Hi", "Hello", etc., reply with a friendly greeting and ask how you can help,
-   without forcing technical details.
-6. If the provided CONTEXT does NOT contain enough information to confidently answer,
-   say: "I don't have that specific information, I will connect you with an agent."
-   and set "needs_handoff" to true.
-   Do NOT mention words like "database", "context", "knowledge base" and don't use rmojis or --- in the final answer.
-7. Use the recent conversation only to keep the dialogue coherent (follow-ups, pronouns like "it", etc),
-   but do NOT invent new specs or policies that are not present in the CONTEXT.
+    // Build DO's section
+    const dosText = dos.length > 0
+        ? dos.map((d, i) => `${i + 1}. ${d}`).join('\n')
+        : `1. Answer ONLY about Raptee.HV and the T30 motorcycle
+2. Answer only for what the user asks, balanced information
+3. For greetings, reply friendly and ask how you can help
+4. Keep responses concise and professional`;
 
+    // Build DON'Ts section
+    const dontsText = donts.length > 0
+        ? donts.map((d, i) => `${i + 1}. ${d}`).join('\n')
+        : `1. Don't discuss competitor brands (Ather, Ola, Revolt, etc.)
+2. Don't use emojis
+3. Don't mention words like "database", "context", "knowledge base"
+4. Don't invent specs not in CONTEXT`;
+
+    const systemPrompt = `${intro}
+
+CONTEXT FROM KNOWLEDGE BASE:
+${context || "No relevant context found."}
+
+CONVERSATION HISTORY:
+${conversationHistoryText || "None"}
+
+USER MESSAGE:
+${userMessage}
+
+GUIDELINES - DO:
+${dosText}
+
+GUIDELINES - DON'T:
+${dontsText}
+
+RESPONSE FORMAT (FIXED - JSON):
 Respond in JSON: { "needs_handoff": boolean, "reason": string|null, "bot_response": string }
-- Set needs_handoff to true if user explicitly asks for human agent, support, or assistance
-- Keep responses concise and professional
-- Do not use emojis`;
+
+INTENT DETECTION (FIXED):
+- Set needs_handoff to true if user explicitly asks for human agent, support, or has issues
+- If CONTEXT doesn't contain enough info, say "I don't have that specific information, I will connect you with an agent." and set needs_handoff to true
+- If user asks about competitor brands, reply: "As a Raptee assistant ask me anything about only Raptee and its features."
+
+Keep your response under ${wordLimit} words.`;
 
     try {
         const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('LLM timeout')), 30000));
@@ -265,6 +312,7 @@ Respond in JSON: { "needs_handoff": boolean, "reason": string|null, "bot_respons
         return { needs_handoff: true, reason: "Technical issues", bot_response: "I'm experiencing technical difficulties. Let me connect you with support." };
     }
 }
+
 
 async function sendChatwootMessage(conversationId, text) {
     try {
@@ -623,6 +671,184 @@ app.get('/api/bookings/my-bookings', async (req, res) => {
 });
 
 // ================================================================
+// ⚙️ SETTINGS API ROUTES
+// ================================================================
+
+// Settings page
+app.get('/settings', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'settings.html'));
+});
+
+// Bot Settings CRUD
+app.get('/api/settings/:botType', async (req, res) => {
+    try {
+        const settings = await getBotSettings(req.params.botType);
+        res.json(settings);
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+app.put('/api/settings/:botType', async (req, res) => {
+    try {
+        const result = await saveBotSettings(req.params.botType, req.body);
+        res.json({ success: true, data: result });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+app.delete('/api/settings/:botType', async (req, res) => {
+    try {
+        await deleteBotSettings(req.params.botType);
+        res.json({ success: true });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+// Chroma Configs CRUD
+app.get('/api/chroma/configs', async (req, res) => {
+    try {
+        const configs = await getAllChromaConfigs();
+        res.json(configs);
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+app.post('/api/chroma/configs', async (req, res) => {
+    try {
+        const result = await saveChromaConfig(req.body);
+        res.json(result);
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+app.put('/api/chroma/configs/:configId', async (req, res) => {
+    try {
+        const result = await updateChromaConfig(req.params.configId, req.body);
+        res.json(result);
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+app.delete('/api/chroma/configs/:configId', async (req, res) => {
+    try {
+        await deleteChromaConfig(req.params.configId);
+        res.json({ success: true });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+app.post('/api/chroma/activate/:configId/:collection', async (req, res) => {
+    try {
+        const result = await activateChromaConfig(req.params.configId, req.params.collection);
+        // Re-initialize Chroma with new config
+        const config = await getChromaConfig(req.params.configId);
+        if (config) {
+            await initFromConfig(config, req.params.collection);
+        }
+        res.json({ success: true, data: result });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+// Chroma Collections
+app.get('/api/chroma/collections/:configId', async (req, res) => {
+    try {
+        const config = await getChromaConfig(req.params.configId);
+        if (!config) return res.status(404).json({ error: 'Config not found' });
+        const collections = await listCollections(config);
+        res.json(collections);
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+app.post('/api/chroma/collections/:configId', async (req, res) => {
+    try {
+        const config = await getChromaConfig(req.params.configId);
+        if (!config) return res.status(404).json({ error: 'Config not found' });
+        await createCollection(config, req.body.name);
+        res.json({ success: true });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+app.delete('/api/chroma/collections/:configId/:collectionName', async (req, res) => {
+    try {
+        const config = await getChromaConfig(req.params.configId);
+        if (!config) return res.status(404).json({ error: 'Config not found' });
+        await deleteCollection(config, req.params.collectionName);
+        res.json({ success: true });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+// Chroma Documents
+app.get('/api/chroma/documents/:configId/:collection', async (req, res) => {
+    try {
+        const config = await getChromaConfig(req.params.configId);
+        if (!config) return res.status(404).json({ error: 'Config not found' });
+        const documents = await getDocuments(config, req.params.collection);
+        res.json(documents);
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+app.post('/api/chroma/documents/:configId/:collection', async (req, res) => {
+    try {
+        const config = await getChromaConfig(req.params.configId);
+        if (!config) return res.status(404).json({ error: 'Config not found' });
+        const result = await addDocument(config, req.params.collection, req.body);
+        res.json(result);
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+app.put('/api/chroma/documents/:configId/:collection/:docId', async (req, res) => {
+    try {
+        const config = await getChromaConfig(req.params.configId);
+        if (!config) return res.status(404).json({ error: 'Config not found' });
+        const result = await updateDocument(config, req.params.collection, req.params.docId, req.body);
+        res.json(result);
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+app.delete('/api/chroma/documents/:configId/:collection/:docId', async (req, res) => {
+    try {
+        const config = await getChromaConfig(req.params.configId);
+        if (!config) return res.status(404).json({ error: 'Config not found' });
+        await deleteDocument(config, req.params.collection, req.params.docId);
+        res.json({ success: true });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+app.delete('/api/chroma/documents/:configId/:collection/clear', async (req, res) => {
+    try {
+        const config = await getChromaConfig(req.params.configId);
+        if (!config) return res.status(404).json({ error: 'Config not found' });
+        const result = await clearCollection(config, req.params.collection);
+        res.json(result);
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+// ================================================================
 // 📱 MOUNT BOT ROUTERS
 // ================================================================
 app.use('/', whatsappRouter);    // WhatsApp: /webhooks/meta
@@ -634,6 +860,12 @@ app.use((req, res) => {
 });
 
 // 🚀 START
-httpServer.listen(PORT, "0.0.0.0", () => {
+httpServer.listen(PORT, "0.0.0.0", async () => {
     console.log(`Server running on port ${PORT}`);
+
+    // Initialize Chroma connection
+    await initChroma();
+
+    // Warm the settings cache at startup
+    await warmCache();
 });

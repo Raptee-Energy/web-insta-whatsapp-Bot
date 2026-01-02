@@ -10,17 +10,17 @@
   "projects": [
     {
       "idx": 1,
-      "id": "17937000000013019",
-      "name": "raptee-bot",
+      "id": "15469000001655230",
+      "name": "Marketing",
       "domain": {
-        "id": "50035473533",
-        "name": "raptee-bot-60057232471.development"
+        "id": "50037415026",
+        "name": "marketing-60038649368.development"
       },
       "timezone": "Asia/Kolkata",
       "env": [
         {
           "idx": 1,
-          "id": "60057232471",
+          "id": "60038649368",
           "name": "Development",
           "type": 3
         }

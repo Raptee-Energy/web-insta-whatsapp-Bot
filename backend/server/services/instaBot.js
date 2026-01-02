@@ -4,6 +4,7 @@
 import { Router } from "express";
 import axios from "axios";
 import { retrieveRelevantChunks, getMistral } from "./chromaService.js";
+import { getBotSettings } from "./settingsService.js";
 
 const router = Router();
 
@@ -86,17 +87,44 @@ async function generateAIResponse(context, userMessage) {
     const mistral = getMistral();
     if (!mistral) return "ASSISTANCE_NEEDED";
 
-    const prompt = `You are RapteeHV's professional customer service assistant for Instagram.
+    // Load dynamic settings for Instagram bot
+    const settings = await getBotSettings('instagram');
+    const intro = settings.introduction || "You are RapteeHV's professional customer service assistant for Instagram.";
+    const dos = Array.isArray(settings.dos) ? settings.dos : [];
+    const donts = Array.isArray(settings.donts) ? settings.donts : [];
+    const wordLimit = settings.word_limit || 80;
+
+    const dosText = dos.length > 0
+        ? dos.map((d, i) => `- ${d}`).join('\n')
+        : `- Provide concise, professional responses
+- Guide users to book test rides or find showrooms
+- Answer questions about T30 features`;
+
+    const dontsText = donts.length > 0
+        ? donts.map((d, i) => `- ${d}`).join('\n')
+        : `- Don't use emojis
+- Don't make up information`;
+
+    const prompt = `${intro}
+
 CONTEXT: ${context}
 USER QUERY: ${userMessage}
-INSTRUCTIONS:
-- If users explicitly ask to connect with an agent, or if they are facing any issues respond with: ASSISTANCE_NEEDED
+
+GUIDELINES - DO:
+${dosText}
+
+GUIDELINES - DON'T:
+${dontsText}
+
+INTENT DETECTION (FIXED - check these first):
+- If users explicitly ask to connect with an agent, or if they are facing any issues, respond with: ASSISTANCE_NEEDED
 - If you cannot answer confidently, respond with: ASSISTANCE_NEEDED
-- Provide concise, professional responses without emojis
 - If the query relates to booking a test ride, respond with: INTENT_BOOKING
 - If the query relates to booking/buying T30, respond with: INTENT_T30
 - If the query relates to showroom locations, respond with: INTENT_SHOWROOM
-- Otherwise, provide a helpful answer and end with: "Type 'menu' to see all available options."`;
+- Otherwise, provide a helpful answer and end with: "Type 'menu' to see all available options."
+
+Keep your response under ${wordLimit} words.`;
 
     try {
         const response = await mistral.chat.complete({

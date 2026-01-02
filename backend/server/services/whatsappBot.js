@@ -4,6 +4,7 @@
 import { Router } from "express";
 import axios from "axios";
 import { retrieveRelevantChunks, getMistral } from "./chromaService.js";
+import { getBotSettings } from "./settingsService.js";
 
 const router = Router();
 
@@ -23,12 +24,40 @@ async function generateMistralResponse(context, userMessage) {
     const mistral = getMistral();
     if (!mistral) return "ASSISTANCE_NEEDED";
 
-    const prompt = `You are Raptee.HV's AI assistant. 
-    CONTEXT: ${context}
-    USER QUERY: ${userMessage}
-    INSTRUCTIONS: Answer concisely. 
-    - If user asks about Booking, Showrooms, or Specifications, reply ONLY: "SHOW_MENU".
-    - If unknown, reply ONLY: "ASSISTANCE_NEEDED".`;
+    // Load dynamic settings for WhatsApp bot
+    const settings = await getBotSettings('whatsapp');
+    const intro = settings.introduction || "You are Raptee.HV's AI assistant.";
+    const dos = Array.isArray(settings.dos) ? settings.dos : [];
+    const donts = Array.isArray(settings.donts) ? settings.donts : [];
+    const wordLimit = settings.word_limit || 80;
+
+    const dosText = dos.length > 0
+        ? dos.map(d => `- ${d}`).join('\n')
+        : `- Answer concisely
+- Guide users to menu options when relevant
+- Be helpful and professional`;
+
+    const dontsText = donts.length > 0
+        ? donts.map(d => `- ${d}`).join('\n')
+        : `- Don't provide overly long responses
+- Don't make up information`;
+
+    const prompt = `${intro}
+
+CONTEXT: ${context}
+USER QUERY: ${userMessage}
+
+GUIDELINES - DO:
+${dosText}
+
+GUIDELINES - DON'T:
+${dontsText}
+
+INTENT DETECTION (FIXED):
+- If user asks about Booking, Showrooms, or Specifications, reply ONLY: "SHOW_MENU".
+- If unknown or cannot answer confidently, reply ONLY: "ASSISTANCE_NEEDED".
+
+Keep your response under ${wordLimit} words.`;
 
     try {
         const response = await mistral.chat.complete({

@@ -254,13 +254,23 @@ const ChatPage = ({ mode, onBack, onClose }) => {
         if (socketRef.current && socketRef.current.connected) return;
 
         const socketUrl = window.location.origin;
-        const newSocket = io(socketUrl, { transports: ['websocket'], reconnection: true });
+        // Removed forced websocket transport to allow polling fallback
+        const newSocket = io(socketUrl, {
+            reconnection: true,
+            reconnectionAttempts: 5,
+            reconnectionDelay: 1000
+        });
         socketRef.current = newSocket;
 
         newSocket.on("connect", () => {
+            console.log("✅ Socket connected!");
             setIsLoading(false);
             newSocket.emit("join_conversation", conversationId);
             setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 200);
+        });
+
+        newSocket.on("connect_error", (error) => {
+            console.error("❌ Socket connection error:", error);
         });
 
         newSocket.on("bot_typing", (status) => setIsTyping(status));

@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot Settings - RapteeHV</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+            min-height: 100vh;
+            color: #1a1a2e;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        .subtitle {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 0.875rem 1.25rem;
+            border: none;
+            background: transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #64748b;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .tab:hover {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .tab-icon {
+            font-size: 1.125rem;
+        }
+
+        /* Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.25rem;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        .label-hint {
+            font-weight: 400;
+            color: #9ca3af;
+            font-size: 0.75rem;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="password"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 0.875rem;
+            font-family: inherit;
+            transition: all 0.2s;
+            background: #fafafa;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #6366f1;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        textarea.short {
+            min-height: 80px;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.25rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-danger {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .btn-danger:hover {
+            background: #fee2e2;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.75rem;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        /* DO/DON'T styling */
+        .guidelines-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+        }
+
+        .do-section label {
+            color: #059669;
+        }
+
+        .dont-section label {
+            color: #dc2626;
+        }
+
+        .do-section textarea {
+            border-color: #d1fae5;
+            background: #f0fdf4;
+        }
+
+        .do-section textarea:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .dont-section textarea {
+            border-color: #fee2e2;
+            background: #fef2f2;
+        }
+
+        .dont-section textarea:focus {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+
+        /* Chroma Section */
+        .selector-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .selector-group {
+            background: #fafafa;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .selector-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .selector-header label {
+            margin-bottom: 0;
+        }
+
+        .active-badge {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 0.375rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 0.875rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        th {
+            background: #f8fafc;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+        }
+
+        td {
+            font-size: 0.875rem;
+        }
+
+        tr:hover {
+            background: #fafafa;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .truncate {
+            max-width: 300px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .modal-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #9ca3af;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: #374151;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .toast {
+            padding: 0.875rem 1.25rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .toast-success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .toast-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Loading */
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #e5e7eb;
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #9ca3af;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                flex-wrap: wrap;
+            }
+
+            .tab {
+                flex: 1 1 45%;
+            }
+
+            .guidelines-row,
+            .selector-row,
+            .input-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">⚙️</div>
+                <div>
+                    <h1>Bot Settings</h1>
+                    <p class="subtitle">Configure AI assistants for Website, Instagram & WhatsApp</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" data-tab="website">
+                <span class="tab-icon">🌐</span> Website
+            </button>
+            <button class="tab" data-tab="instagram">
+                <span class="tab-icon">📸</span> Instagram
+            </button>
+            <button class="tab" data-tab="whatsapp">
+                <span class="tab-icon">📱</span> WhatsApp
+            </button>
+            <button class="tab" data-tab="chroma">
+                <span class="tab-icon">🗄️</span> Database
+            </button>
+        </div>
+
+        <!-- Website Settings -->
+        <div id="website" class="tab-content active">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">🌐 Website Bot Settings</h2>
+                </div>
+                <form id="website-form">
+                    <div class="form-group">
+                        <label>Introduction / Context</label>
+                        <textarea id="website-intro" placeholder="Describe the bot's role and context..."></textarea>
+                    </div>
+                    <div class="guidelines-row">
+                        <div class="form-group do-section">
+                            <label>✅ DO's <span class="label-hint">(one per line)</span></label>
+                            <textarea id="website-dos"
+                                placeholder="Answer questions about T30&#10;Be friendly for greetings&#10;Keep responses concise"></textarea>
+                        </div>
+                        <div class="form-group dont-section">
+                            <label>❌ DON'Ts <span class="label-hint">(one per line)</span></label>
+                            <textarea id="website-donts"
+                                placeholder="Don't discuss competitors&#10;Don't use emojis&#10;Don't make up information"></textarea>
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="form-group">
+                            <label>Word Limit</label>
+                            <input type="number" id="website-wordlimit" min="20" max="500" value="100">
+                        </div>
+                        <div class="form-group">
+                            <label>Documents to Retrieve (nResults)</label>
+                            <input type="number" id="website-nresults" min="1" max="10" value="2">
+                        </div>
+                    </div>
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary">💾 Save Settings</button>
+                        <button type="button" class="btn btn-secondary" onclick="resetSettings('website')">🔄 Reset to
+                            Defaults</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Instagram Settings -->
+        <div id="instagram" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">📸 Instagram Bot Settings</h2>
+                </div>
+                <form id="instagram-form">
+                    <div class="form-group">
+                        <label>Introduction / Context</label>
+                        <textarea id="instagram-intro"
+                            placeholder="Describe the bot's role for Instagram..."></textarea>
+                    </div>
+                    <div class="guidelines-row">
+                        <div class="form-group do-section">
+                            <label>✅ DO's <span class="label-hint">(one per line)</span></label>
+                            <textarea id="instagram-dos"
+                                placeholder="Provide concise responses&#10;Guide users to book test rides"></textarea>
+                        </div>
+                        <div class="form-group dont-section">
+                            <label>❌ DON'Ts <span class="label-hint">(one per line)</span></label>
+                            <textarea id="instagram-donts"
+                                placeholder="Don't use emojis&#10;Don't make up information"></textarea>
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="form-group">
+                            <label>Word Limit</label>
+                            <input type="number" id="instagram-wordlimit" min="20" max="500" value="80">
+                        </div>
+                        <div class="form-group">
+                            <label>Documents to Retrieve (nResults)</label>
+                            <input type="number" id="instagram-nresults" min="1" max="10" value="2">
+                        </div>
+                    </div>
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary">💾 Save Settings</button>
+                        <button type="button" class="btn btn-secondary" onclick="resetSettings('instagram')">🔄 Reset to
+                            Defaults</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- WhatsApp Settings -->
+        <div id="whatsapp" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">📱 WhatsApp Bot Settings</h2>
+                </div>
+                <form id="whatsapp-form">
+                    <div class="form-group">
+                        <label>Introduction / Context</label>
+                        <textarea id="whatsapp-intro" placeholder="Describe the bot's role for WhatsApp..."></textarea>
+                    </div>
+                    <div class="guidelines-row">
+                        <div class="form-group do-section">
+                            <label>✅ DO's <span class="label-hint">(one per line)</span></label>
+                            <textarea id="whatsapp-dos"
+                                placeholder="Answer concisely&#10;Guide users to menu options"></textarea>
+                        </div>
+                        <div class="form-group dont-section">
+                            <label>❌ DON'Ts <span class="label-hint">(one per line)</span></label>
+                            <textarea id="whatsapp-donts" placeholder="Don't provide overly long responses"></textarea>
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="form-group">
+                            <label>Word Limit</label>
+                            <input type="number" id="whatsapp-wordlimit" min="20" max="500" value="80">
+                        </div>
+                        <div class="form-group">
+                            <label>Documents to Retrieve (nResults)</label>
+                            <input type="number" id="whatsapp-nresults" min="1" max="10" value="2">
+                        </div>
+                    </div>
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary">💾 Save Settings</button>
+                        <button type="button" class="btn btn-secondary" onclick="resetSettings('whatsapp')">🔄 Reset to
+                            Defaults</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Chroma Database -->
+        <div id="chroma" class="tab-content">
+            <!-- Active Config Banner -->
+            <div id="active-config-banner" class="card"
+                style="background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); display: none;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div
+                        style="width: 48px; height: 48px; background: #10b981; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
+                        ⚡</div>
+                    <div style="flex: 1;">
+                        <p style="font-weight: 600; color: #065f46;">Currently Active</p>
+                        <p style="color: #047857;" id="active-config-text">-</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Database Selector -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">🗄️ Database Configuration</h2>
+                </div>
+
+                <div class="selector-row">
+                    <div class="selector-group">
+                        <div class="selector-header">
+                            <label>Database</label>
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="openAddDbModal()">+
+                                Add</button>
+                        </div>
+                        <select id="db-selector" onchange="onDbChange()">
+                            <option value="">Select a database...</option>
+                        </select>
+                    </div>
+                    <div class="selector-group">
+                        <div class="selector-header">
+                            <label>Collection</label>
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="openAddCollectionModal()"
+                                id="add-collection-btn" disabled>+ Add</button>
+                        </div>
+                        <select id="collection-selector" onchange="onCollectionChange()" disabled>
+                            <option value="">Select a collection...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="btn-group" style="margin-top: 0;">
+                    <button type="button" class="btn btn-success" onclick="activateConfig()" id="activate-btn" disabled>
+                        ⚡ Activate This Configuration
+                    </button>
+                    <button type="button" class="btn btn-danger" onclick="deleteConfig()" id="delete-db-btn" disabled>
+                        🗑️ Delete Database
+                    </button>
+                </div>
+            </div>
+
+            <!-- Q&A Management -->
+            <div class="card" id="qa-section" style="display: none;">
+                <div class="card-header">
+                    <h2 class="card-title">📚 Q&A Entries</h2>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button type="button" class="btn btn-sm btn-secondary" onclick="refreshDocuments()">🔄
+                            Refresh</button>
+                        <button type="button" class="btn btn-sm btn-primary" onclick="openQaModal()">+ Add
+                            Entry</button>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="clearAllDocuments()">🗑️ Clear
+                            All</button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">#</th>
+                                <th>Question</th>
+                                <th>Answer</th>
+                                <th style="width: 100px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="qa-table-body">
+                            <tr>
+                                <td colspan="4" class="empty-state">
+                                    <div class="empty-state-icon">📭</div>
+                                    <p>No Q&A entries. Add some manually or upload a CSV.</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Database Modal -->
+    <div class="modal-overlay" id="add-db-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Add Database Connection</h3>
+                <button class="modal-close" onclick="closeModal('add-db-modal')">&times;</button>
+            </div>
+            <form id="add-db-form" onsubmit="saveDatabase(event)">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Display Name</label>
+                        <input type="text" id="db-name" placeholder="e.g. Production DB" required>
+                    </div>
+                    <div class="form-group">
+                        <label>API Key</label>
+                        <input type="password" id="db-apikey" placeholder="chr-xxxxx..." required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tenant</label>
+                        <input type="text" id="db-tenant" placeholder="e.g. default_tenant" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Database Name</label>
+                        <input type="text" id="db-database" placeholder="e.g. my-database" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('add-db-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Database</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Collection Modal -->
+    <div class="modal-overlay" id="add-collection-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Create Collection</h3>
+                <button class="modal-close" onclick="closeModal('add-collection-modal')">&times;</button>
+            </div>
+            <form id="add-collection-form" onsubmit="createCollection(event)">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Collection Name</label>
+                        <input type="text" id="collection-name" placeholder="e.g. product_faqs" required>
+                        <p class="label-hint" style="margin-top: 0.25rem;">Use lowercase with underscores</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary"
+                        onclick="closeModal('add-collection-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Collection</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Q&A Modal -->
+    <div class="modal-overlay" id="qa-modal">
+        <div class="modal" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="qa-modal-title">Add Q&A Entry</h3>
+                <button class="modal-close" onclick="closeModal('qa-modal')">&times;</button>
+            </div>
+            <form id="qa-form" onsubmit="saveQa(event)">
+                <div class="modal-body">
+                    <input type="hidden" id="qa-id">
+                    <div class="form-group">
+                        <label>Question</label>
+                        <input type="text" id="qa-question" placeholder="e.g. What is the range of T30?" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Answer</label>
+                        <textarea id="qa-answer" placeholder="Enter the answer..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('qa-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="qa-submit-btn">Add Q&A</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script>
+        // ================================================================
+        // STATE
+        // ================================================================
+        let chromaConfigs = [];
+        let selectedConfigId = null;
+        let selectedCollection = null;
+        let documents = [];
+        let activeConfig = null;
+
+        // ================================================================
+        // TABS
+        // ================================================================
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        // ================================================================
+        // TOAST
+        // ================================================================
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `${type === 'success' ? '✓' : '✕'} ${message}`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        // ================================================================
+        // MODAL
+        // ================================================================
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+        function openAddDbModal() { openModal('add-db-modal'); }
+        function openAddCollectionModal() { openModal('add-collection-modal'); }
+        function openQaModal(qa = null) {
+            document.getElementById('qa-modal-title').textContent = qa ? 'Edit Q&A Entry' : 'Add Q&A Entry';
+            document.getElementById('qa-submit-btn').textContent = qa ? 'Update Q&A' : 'Add Q&A';
+            document.getElementById('qa-id').value = qa?.id || '';
+            document.getElementById('qa-question').value = qa?.question || '';
+            document.getElementById('qa-answer').value = qa?.answer || '';
+            openModal('qa-modal');
+        }
+
+        // ================================================================
+        // BOT SETTINGS
+        // ================================================================
+        async function loadSettings(botType) {
+            try {
+                const res = await fetch(`/api/settings/${botType}`);
+                const data = await res.json();
+                if (data.error) throw new Error(data.error);
+
+                document.getElementById(`${botType}-intro`).value = data.introduction || '';
+                document.getElementById(`${botType}-dos`).value = (data.dos || []).join('\n');
+                document.getElementById(`${botType}-donts`).value = (data.donts || []).join('\n');
+                document.getElementById(`${botType}-wordlimit`).value = data.word_limit || 100;
+                document.getElementById(`${botType}-nresults`).value = data.n_results || 2;
+            } catch (e) {
+                console.error(`Failed to load ${botType} settings:`, e);
+            }
+        }
+
+        async function saveSettings(botType, e) {
+            e.preventDefault();
+            try {
+                const payload = {
+                    introduction: document.getElementById(`${botType}-intro`).value.trim(),
+                    dos: document.getElementById(`${botType}-dos`).value.split('\n').map(s => s.trim()).filter(Boolean),
+                    donts: document.getElementById(`${botType}-donts`).value.split('\n').map(s => s.trim()).filter(Boolean),
+                    word_limit: parseInt(document.getElementById(`${botType}-wordlimit`).value) || 100,
+                    n_results: parseInt(document.getElementById(`${botType}-nresults`).value) || 2
+                };
+
+                const res = await fetch(`/api/settings/${botType}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!res.ok) throw new Error('Failed to save');
+                showToast(`${botType.charAt(0).toUpperCase() + botType.slice(1)} settings saved!`);
+            } catch (e) {
+                showToast(e.message, 'error');
+            }
+        }
+
+        async function resetSettings(botType) {
+            if (!confirm('Reset to default settings? This cannot be undone.')) return;
+            try {
+                await fetch(`/api/settings/${botType}`, { method: 'DELETE' });
+                await loadSettings(botType);
+                showToast('Settings reset to defaults');
+            } catch (e) {
+                showToast('Failed to reset', 'error');
+            }
+        }
+
+        document.getElementById('website-form').addEventListener('submit', (e) => saveSettings('website', e));
+        document.getElementById('instagram-form').addEventListener('submit', (e) => saveSettings('instagram', e));
+        document.getElementById('whatsapp-form').addEventListener('submit', (e) => saveSettings('whatsapp', e));
+
+        // ================================================================
+        // CHROMA CONFIG
+        // ================================================================
+        async function loadChromaConfigs() {
+            try {
+                const res = await fetch('/api/chroma/configs');
+                chromaConfigs = await res.json();
+
+                const selector = document.getElementById('db-selector');
+                selector.innerHTML = '<option value="">Select a database...</option>';
+                chromaConfigs.forEach(cfg => {
+                    const opt = document.createElement('option');
+                    opt.value = cfg.ROWID;
+                    opt.textContent = `${cfg.name} (${cfg.chromaDatabase})${cfg.is_active ? ' ✓' : ''}`;
+                    selector.appendChild(opt);
+                });
+
+                // Find active config
+                activeConfig = chromaConfigs.find(c => c.is_active);
+                updateActiveBanner();
+            } catch (e) {
+                console.error('Failed to load configs:', e);
+            }
+        }
+
+        function updateActiveBanner() {
+            const banner = document.getElementById('active-config-banner');
+            const text = document.getElementById('active-config-text');
+            if (activeConfig) {
+                banner.style.display = 'block';
+                text.textContent = `${activeConfig.name} → ${activeConfig.active_collection || 'No collection'}`;
+            } else {
+                banner.style.display = 'none';
+            }
+        }
+
+        async function onDbChange() {
+            const configId = document.getElementById('db-selector').value;
+            selectedConfigId = configId;
+            selectedCollection = null;
+
+            const collectionSelector = document.getElementById('collection-selector');
+            const addCollectionBtn = document.getElementById('add-collection-btn');
+            const deleteDbBtn = document.getElementById('delete-db-btn');
+
+            if (!configId) {
+                collectionSelector.disabled = true;
+                addCollectionBtn.disabled = true;
+                deleteDbBtn.disabled = true;
+                document.getElementById('qa-section').style.display = 'none';
+                return;
+            }
+
+            addCollectionBtn.disabled = false;
+            deleteDbBtn.disabled = false;
+
+            try {
+                const res = await fetch(`/api/chroma/collections/${configId}`);
+                const collections = await res.json();
+
+                collectionSelector.disabled = false;
+                collectionSelector.innerHTML = '<option value="">Select a collection...</option>';
+                collections.forEach(col => {
+                    const opt = document.createElement('option');
+                    opt.value = col.name;
+                    opt.textContent = col.name;
+                    collectionSelector.appendChild(opt);
+                });
+            } catch (e) {
+                showToast('Failed to load collections', 'error');
+            }
+        }
+
+        async function onCollectionChange() {
+            selectedCollection = document.getElementById('collection-selector').value;
+            const activateBtn = document.getElementById('activate-btn');
+
+            if (!selectedCollection) {
+                activateBtn.disabled = true;
+                document.getElementById('qa-section').style.display = 'none';
+                return;
+            }
+
+            activateBtn.disabled = false;
+            document.getElementById('qa-section').style.display = 'block';
+            await refreshDocuments();
+        }
+
+        async function saveDatabase(e) {
+            e.preventDefault();
+            try {
+                const payload = {
+                    name: document.getElementById('db-name').value,
+                    api_key: document.getElementById('db-apikey').value,
+                    tenant: document.getElementById('db-tenant').value,
+                    chromaDatabase: document.getElementById('db-database').value
+                };
+
+                const res = await fetch('/api/chroma/configs', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!res.ok) throw new Error('Failed to add database');
+
+                closeModal('add-db-modal');
+                document.getElementById('add-db-form').reset();
+                await loadChromaConfigs();
+                showToast('Database added successfully');
+            } catch (e) {
+                showToast(e.message, 'error');
+            }
+        }
+
+        async function deleteConfig() {
+            if (!selectedConfigId) return;
+            if (!confirm('Delete this database configuration?')) return;
+
+            try {
+                await fetch(`/api/chroma/configs/${selectedConfigId}`, { method: 'DELETE' });
+                await loadChromaConfigs();
+                document.getElementById('db-selector').value = '';
+                onDbChange();
+                showToast('Database deleted');
+            } catch (e) {
+                showToast('Failed to delete', 'error');
+            }
+        }
+
+        async function createCollection(e) {
+            e.preventDefault();
+            if (!selectedConfigId) return;
+
+            try {
+                const name = document.getElementById('collection-name').value;
+                const res = await fetch(`/api/chroma/collections/${selectedConfigId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name })
+                });
+
+                if (!res.ok) throw new Error('Failed to create collection');
+
+                closeModal('add-collection-modal');
+                document.getElementById('add-collection-form').reset();
+                await onDbChange();
+                showToast('Collection created');
+            } catch (e) {
+                showToast(e.message, 'error');
+            }
+        }
+
+        async function activateConfig() {
+            if (!selectedConfigId || !selectedCollection) return;
+
+            try {
+                const res = await fetch(`/api/chroma/activate/${selectedConfigId}/${selectedCollection}`, {
+                    method: 'POST'
+                });
+
+                if (!res.ok) throw new Error('Failed to activate');
+
+                await loadChromaConfigs();
+                showToast('Configuration activated! Bots now use this database.');
+            } catch (e) {
+                showToast(e.message, 'error');
+            }
+        }
+
+        // ================================================================
+        // DOCUMENTS
+        // ================================================================
+        async function refreshDocuments() {
+            if (!selectedConfigId || !selectedCollection) return;
+
+            try {
+                const res = await fetch(`/api/chroma/documents/${selectedConfigId}/${selectedCollection}`);
+                documents = await res.json();
+                renderDocuments();
+            } catch (e) {
+                showToast('Failed to load documents', 'error');
+            }
+        }
+
+        function renderDocuments() {
+            const tbody = document.getElementById('qa-table-body');
+
+            if (!documents || documents.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="empty-state">
+                            <div class="empty-state-icon">📭</div>
+                            <p>No Q&A entries. Add some manually or upload a CSV.</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = documents.map((doc, i) => `
+                <tr>
+                    <td style="color: #9ca3af; font-family: monospace;">${i + 1}</td>
+                    <td class="truncate">${escapeHtml(doc.question || doc.content?.substring(0, 100) || '-')}</td>
+                    <td class="truncate">${escapeHtml(doc.answer || doc.content?.substring(100) || '-')}</td>
+                    <td class="actions">
+                        <button class="btn btn-sm btn-secondary" onclick='openQaModal(${JSON.stringify(doc).replace(/'/g, "&#39;")})'>✏️</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteDocument('${doc.id}')">🗑️</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        async function saveQa(e) {
+            e.preventDefault();
+            if (!selectedConfigId || !selectedCollection) return;
+
+            const id = document.getElementById('qa-id').value;
+            const payload = {
+                question: document.getElementById('qa-question').value,
+                answer: document.getElementById('qa-answer').value
+            };
+
+            try {
+                const url = id
+                    ? `/api/chroma/documents/${selectedConfigId}/${selectedCollection}/${id}`
+                    : `/api/chroma/documents/${selectedConfigId}/${selectedCollection}`;
+
+                const res = await fetch(url, {
+                    method: id ? 'PUT' : 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!res.ok) throw new Error('Failed to save');
+
+                closeModal('qa-modal');
+                await refreshDocuments();
+                showToast(id ? 'Q&A updated' : 'Q&A added');
+            } catch (e) {
+                showToast(e.message, 'error');
+            }
+        }
+
+        async function deleteDocument(docId) {
+            if (!confirm('Delete this Q&A entry?')) return;
+
+            try {
+                await fetch(`/api/chroma/documents/${selectedConfigId}/${selectedCollection}/${docId}`, {
+                    method: 'DELETE'
+                });
+                await refreshDocuments();
+                showToast('Q&A deleted');
+            } catch (e) {
+                showToast('Failed to delete', 'error');
+            }
+        }
+
+        async function clearAllDocuments() {
+            if (!confirm('Clear ALL Q&A data from this collection? This cannot be undone!')) return;
+
+            try {
+                await fetch(`/api/chroma/documents/${selectedConfigId}/${selectedCollection}/clear`, {
+                    method: 'DELETE'
+                });
+                await refreshDocuments();
+                showToast('Collection cleared');
+            } catch (e) {
+                showToast('Failed to clear', 'error');
+            }
+        }
+
+        // ================================================================
+        // INIT
+        // ================================================================
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSettings('website');
+            loadSettings('instagram');
+            loadSettings('whatsapp');
+            loadChromaConfigs();
+        });
+    </script>
+</body>
+
+</html>
